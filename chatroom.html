@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		body{
+			position: absolute;
+			width: 100%;
+			height: 88%;
+			margin: 0;
+			padding: 0;
+		}
+
+		#input{
+			border: 30px solid black;
+			box-sizing: border-box;
+			position: absolute;
+			width: 100%;
+			fixed:bottom;
+		}
+
+		#messageWrapper{
+			width: 100%;
+			height: 100%;
+			border:2px solid black;
+			box-sizing: border-box;
+			overflow: scroll;
+		}
+
+		.mine{
+			text-align: right;
+			color: red;
+			font-size: 30px;
+			font-weight: bold;
+		}
+
+		.others{
+			font-weight: bold;
+			font-size: 30px;
+		}
+	</style>
+</head>
+<body>
+	<div id="messageWrapper"></div>
+	<input type="text" id="input">
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var oInput = document.getElementById('input');
+		var messageWrapper = document.getElementById('messageWrapper')
+
+		var socket = io.connect('ws://localhost:8899');
+
+		oInput.onkeyup = function(ev){
+			if( ev.keyCode == 13 ){
+				sendMessage();
+			}
+		}
+
+		socket.on('received',function(data){
+			receiveMessage(data);
+		})
+
+		function sendMessage(){
+			var oDiv = document.createElement('div');
+
+			socket.emit('message',oInput.value);
+
+			oDiv.innerText = oInput.value;
+			oDiv.classList.add('mine');
+
+			messageWrapper.appendChild(oDiv);
+
+			oInput.value = '';
+		}
+
+		function receiveMessage( data ){
+			var oDiv = document.createElement('div');
+				oDiv.innerText = data;
+				oDiv.classList.add('others');
+
+			messageWrapper.appendChild(oDiv);
+		}
+	</script>
+</body>
+</html>
